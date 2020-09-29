@@ -6,9 +6,10 @@ Python implementation of binomialRF
 The binomialRF.py is the python implementation of the original R
 package "binomialRF" by Rachid Zaim (2020): 
 
-The binomialRF package is an R package that provides a feature
-selection algorithm to be used in randomForest classifiers. Treating
-each tree as a quasi binomial stochastic process in a random forest,
+The binomialRF package is a random forest-based feature selection
+package that provides a feature selection algorithm to be used in
+randomForest classifiers. Treating each tree as a quasi binomial
+stochastic process in a random forest,
 binomialRF determines a feature’s importance by how often they are
 selected in practice vs. as expected by random chance. Given that
 trees are co-dependent as they subsample the same data, a theoretical
