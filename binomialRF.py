@@ -56,7 +56,9 @@ class binomialRF(object):
     
     """
     
-    def __init__(self, num_trees, max_depth, feat_sample_by_tree):
+    def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
+        self.X= X
+        self.y= y
         self.num_trees = num_trees
         self.max_depth = max_depth
         self.feat_sample_by_tree = feat_sample_by_tree
@@ -69,3 +71,32 @@ class binomialRF(object):
             warnings.warn('Need more features to train the random forest')
        
 
+        
+
+    def fit():
+
+        ''' pass parameters for random forest '''
+        model = rf(n_estimators=self.num_trees, 
+           max_depth=self.max_depth, 
+           feat_sample_by_tree = self.feat_sample_by_tree)
+        
+    
+    ''' fit random forest to X, y data '''     
+        rfObject = model.fit(self.X,self.y)
+    
+    
+    '''return rfObject '''
+        return(rfObject)
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
