@@ -8,8 +8,8 @@ import pandas as pd
 import structure_dt as stdt
 import graphs
 import random
-from libc.math cimport log as clog
-from libc.math cimport exp
+#from libc.math cimport log as clog
+#from libc.math cimport exp
 #cimport numpy as cnp
 #cimport cython
 
@@ -19,7 +19,7 @@ from numpy import std
 from sklearn.datasets import make_regression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedKFold
-from sklearn.ensemble import RandomForestRegressor as rf2
+#from sklearn.ensemble import RandomForestRegressor as rf2
 import sklearn.tree
 import pandas as pd
 import scipy.stats as st
@@ -28,8 +28,7 @@ import statsmodels.stats.multitest as correct
 from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.datasets import make_classification
 
-
-class binomialRF(object):
+class binomialRF:
     """binomialRF: a correlated binomial process to select features using
     random forests. Requires sci-kit learn's random forest implementation.
     
@@ -57,8 +56,6 @@ class binomialRF(object):
         The percentage of features to consider for each tree.
         Works multiplicatively with feat_ample_by_node.
     
-    
-    
     References:
     -----------
     
@@ -68,52 +65,32 @@ class binomialRF(object):
     
     """
 
-'''  
-def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
-        self.X= X
-        self.y= y
-        self.num_trees = num_trees
-        self.max_depth = max_depth
-        self.feat_sample_by_tree = feat_sample_by_tree
-        
-        if num_trees < 50:
-            warnings.warn('Need more trees to train the random forest')
-        if max_depth is <1:
-            warnings.warn('Trees require a depth of at least a root node')
-        if feat_sample_by_tree < 2:
-            warnings.warn('Need more features to train the random forest')
-'''
-        
-        
-def fit(X,y, num_trees, max_depth, max_features, classifier=False):
-    if(classifier):
+    def __init__(self, X,y):
+        self.X = X
+        self.y = y
+
+    def fitModel(self, X,y, num_trees, max_depth, max_features, classifier=False):
+        '''
+        if(classifier):
+            model = rf(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
+            rfObject = model.fit(X,y)
+        else:
+        '''
         model = rf(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
-        rfObject = model.fit(X,y)
-    else:
-        model = rf2(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
-        rfObject = model.fit(X,y)
-    return(rfObject) 
+        rfObject = model.fit(self.X,self.y)
+        return(rfObject) 
 
-def getMainEffectCounts(rf):
-    ## get root splitting var 
-    features= [[tree.tree_.feature[0]] for j,tree in enumerate(rf.estimators_)]
-    df = pd.Series(data=features)
+    def getMainEffectCounts(rfModel):
+        ## get root splitting var 
+        features= [[tree.tree_.feature[0]] for j,tree in enumerate(rfModel.estimators_)]
+        df = pd.Series(data=features)
 
-    ## calculate frequency of forot split vars
-    df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
-    return(df)
+        ## calculate frequency of forot split vars
+        df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
+        return(df)
 
-def calculatePvalue(df): 
-    df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.TestStatistic]
-    fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
-    df['FDR']= fdrs
-    return(df)
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    def calculatePvalue(df): 
+        df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.TestStatistic]
+        fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
+        df['FDR']= fdrs
+        return(df)
