@@ -10,8 +10,8 @@ import graphs
 import random
 from libc.math cimport log as clog
 from libc.math cimport exp
-cimport numpy as cnp
-cimport cython
+#cimport numpy as cnp
+#cimport cython
 
 from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.datasets import make_classification
@@ -56,7 +56,7 @@ class binomialRF(object):
     
     """
     
-    def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
+def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
         self.X= X
         self.y= y
         self.num_trees = num_trees
@@ -69,28 +69,42 @@ class binomialRF(object):
             warnings.warn('Trees require a depth of at least a root node')
         if feat_sample_by_tree < 2:
             warnings.warn('Need more features to train the random forest')
-       
+    
 
         
 
-    def fit():
+def fit(X,y, num_trees, max_depth, feat_sample_by_tree):
 
-        ''' pass parameters for random forest '''
-        model = rf(n_estimators=self.num_trees, 
-           max_depth=self.max_depth, 
-           feat_sample_by_tree = self.feat_sample_by_tree)
-        
+    # instatiate random forest model
+    model = rf(n_estimators=self.num_trees, 
+        max_depth=self.max_depth, 
+        feat_sample_by_tree = self.feat_sample_by_tree)
+
+    #fit random forest to X, y data     
+    rfObject = model.fit(self.X,self.y)
     
-    ''' fit random forest to X, y data '''     
-        rfObject = model.fit(self.X,self.y)
-    
-    
-    '''return rfObject '''
-        return(rfObject)
+    return(rfObject)
         
     
         
-        
+
+def getMainEffectCounts(rf):
+    ## get root splitting var 
+    features= [[tree.tree_.feature[0]] for j,tree in enumerate(rf.estimators_)]
+    df = pd.Series(data=features)
+
+    ## calculate frequency of forot split vars
+    df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
+    return(df)
+
+def calculatePvalue(df): 
+    df = pd.Series(data=features)
+    df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
+    df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.TestStatistic]
+    fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
+    df['FDR']= fdrs
+    return(df)
+   
         
         
         
