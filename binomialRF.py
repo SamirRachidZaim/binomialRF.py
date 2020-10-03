@@ -13,6 +13,18 @@ from libc.math cimport exp
 #cimport numpy as cnp
 #cimport cython
 
+# evaluate random forest ensemble for regression
+from numpy import mean
+from numpy import std
+from sklearn.datasets import make_regression
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedKFold
+from sklearn.ensemble import RandomForestRegressor as rf2
+import sklearn.tree
+import pandas as pd
+import scipy.stats as st
+import statsmodels.stats.multitest as correct
+
 from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.datasets import make_classification
 
@@ -55,7 +67,8 @@ class binomialRF(object):
     forests to identify biomarker interactions." bioRxiv (2020): 681973.
     
     """
-    
+
+'''  
 def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
         self.X= X
         self.y= y
@@ -69,24 +82,17 @@ def __init__(self, X, y,  num_trees, max_depth, feat_sample_by_tree):
             warnings.warn('Trees require a depth of at least a root node')
         if feat_sample_by_tree < 2:
             warnings.warn('Need more features to train the random forest')
-    
-
+'''
         
-
-def fit(X,y, num_trees, max_depth, feat_sample_by_tree):
-
-    # instatiate random forest model
-    model = rf(n_estimators=self.num_trees, 
-        max_depth=self.max_depth, 
-        feat_sample_by_tree = self.feat_sample_by_tree)
-
-    #fit random forest to X, y data     
-    rfObject = model.fit(self.X,self.y)
-    
-    return(rfObject)
         
-    
-        
+def fit(X,y, num_trees, max_depth, max_features, classifier=False):
+    if(classifier):
+        model = rf(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
+        rfObject = model.fit(X,y)
+    else:
+        model = rf2(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
+        rfObject = model.fit(X,y)
+    return(rfObject) 
 
 def getMainEffectCounts(rf):
     ## get root splitting var 
@@ -98,13 +104,10 @@ def getMainEffectCounts(rf):
     return(df)
 
 def calculatePvalue(df): 
-    df = pd.Series(data=features)
-    df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
     df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.TestStatistic]
     fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
     df['FDR']= fdrs
     return(df)
-   
         
         
         
