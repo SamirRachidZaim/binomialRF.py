@@ -13,10 +13,15 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedKFold
 from sklearn.ensemble import RandomForestRegressor
+import sklearn.tree
+import pandas as pd
+import scipy.stats as st
+import statsmodels.stats.multitest as correct
+
 # define dataset
-X, y = make_regression(n_samples=1000, n_features=20, n_informative=15, noise=0.1, random_state=2)
+X, y = make_regression(n_samples=1000, n_features=20, n_informative=12, noise=0.1, random_state= 2)
 # define the model
-model = RandomForestRegressor()
+model = RandomForestRegressor(max_depth=2,  n_estimators=20, max_features=5)
 # evaluate the model
 rf = model.fit(X,y)
 # report performance
@@ -26,7 +31,16 @@ rf = model.fit(X,y)
 rf.estimators_[0]
 sample_id = 0
 
+tree_dict = dict()
+leaves = dict()
+features = dict()
+
+trees = dict()
+
 for j, tree in enumerate(rf.estimators_):
+    #print(tree)
+
+    trees[j] = [tree]
 
     n_nodes = tree.tree_.node_count
     children_left = tree.tree_.children_left
@@ -39,6 +53,9 @@ for j, tree in enumerate(rf.estimators_):
     leave_id = tree.apply(X)
     node_index = node_indicator.indices[node_indicator.indptr[sample_id]:
                                         node_indicator.indptr[sample_id + 1]]
+
+    features[j] = [tree.tree_.feature[0]]
+    #tree_dict['tree'+str(j)] = ['feature': tree.tree_.feature, 
 
 
     print('Rules used to predict sample %s: ' % sample_id)
@@ -58,6 +75,14 @@ for j, tree in enumerate(rf.estimators_):
                  X[sample_id, feature[node_id]],
                  threshold_sign,
                  threshold[node_id]))
+
+    print('\n\n')
+
+df = pd.Series(data=features)
+df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
+df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.counts]
+fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
+df['FDR']= fdrs
 
 '''
 This stack overflow page contains info for how to access 
