@@ -4,6 +4,7 @@
 
 import warnings
 import pandas as pd
+import numpy as np
 import structure_dt as stdt
 import graphs
 import random
@@ -15,7 +16,6 @@ import random
 # evaluate random forest ensemble for regression
 
 import sklearn.tree
-import pandas as pd
 import scipy.stats as st
 import statsmodels.stats.multitest as correct
 
@@ -107,4 +107,8 @@ class binomialRF:
         return cbinom
 
     def calculate_correlated_pvalues(self, main_effects_counts, cbinom):
-
+        main_effects_counts['correl_pvalue'] = [1-np.sum(cbinom[0:x]) for x in main_effects_counts.TestStatistic]
+        fdrs = correct.fdrcorrection(main_effects_counts.correl_pvalue,  method='negcorr' )[1]
+        main_effects_counts['FDR']= fdrs
+        return main_effects_counts
+  
