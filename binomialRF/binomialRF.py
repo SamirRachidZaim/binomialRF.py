@@ -64,33 +64,34 @@ class binomialRF:
     forests to identify biomarker interactions." bioRxiv (2020): 681973.
     
     """
-
-    def __init__(self, X,y):
+    
+    def __init__(self, X, y, ntrees, max_depth):
         self.X = X
         self.y = y
-
-    def fitModel(self, X,y, num_trees, max_depth, max_features, classifier=False):
-        '''
-        if(classifier):
-            model = rf(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
-            rfObject = model.fit(X,y)
-        else:
-        '''
-        model = rf(n_estimators=num_trees, max_depth=max_depth, max_features= max_features)
-        rfObject = model.fit(self.X,self.y)
-        return(rfObject) 
-
-    def getMainEffectCounts(rfModel):
-        ## get root splitting var 
-        features= [[tree.tree_.feature[0]] for j,tree in enumerate(rfModel.estimators_)]
+        self.ntrees = ntrees
+        self.max_depth= max_depth
+    
+    def fit_model(self):
+        model= rf(n_estimators=self.ntrees,
+                  max_depth=self.max_depth)
+        
+        fitted_model = model.fit(self.X,self.y)
+        
+        return fitted_model
+    
+    
+    def get_main_effects(self, rf_model):
+        
+        features= [[tree.tree_.feature[0]] for j,tree in enumerate(rf_model.estimators_)]
         df = pd.Series(data=features)
 
         ## calculate frequency of forot split vars
-        df = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
-        return(df)
+        main_effects_counts = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
+        return(main_effects_counts)
+    
+    def calculate_pvalue(self, main_effects_counts): 
+        main_effects_counts['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in main_effects_counts.TestStatistic]
+        fdrs = correct.fdrcorrection(main_effects_counts.pvalues,  method='negcorr' )[1]
+        main_effects_counts['FDR']= fdrs
+        return(main_effects_counts)
 
-    def calculatePvalue(df): 
-        df['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in df.TestStatistic]
-        fdrs = correct.fdrcorrection(df.pvalues,  method='negcorr' )[1]
-        df['FDR']= fdrs
-        return(df)
