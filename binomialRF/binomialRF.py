@@ -25,8 +25,14 @@ import pandas as pd
 import scipy.stats as st
 import statsmodels.stats.multitest as correct
 
+from rpy2.robjects.packages import importr
+
+
 from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.datasets import make_classification
+from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
 
 class binomialRF:
     """binomialRF: a correlated binomial process to select features using
@@ -47,7 +53,7 @@ class binomialRF:
         highly recommend using early stopping rather than guesswork or
         grid search to set this parameter.
     
-    max_depth : int, default is 3
+    subsample : int, default is 3
         The maximum depth to use when building trees. This is an important
         parameter.  Smaller values are more likely to underfit and 
         larger values more likely to overfit.
@@ -65,16 +71,15 @@ class binomialRF:
     
     """
     
-    def __init__(self, X, y, ntrees, max_depth):
+    def __init__(self, X, y, ntrees, subsample):
         self.X = X
         self.y = y
         self.ntrees = ntrees
-        self.max_depth= max_depth
+        self.subsample= subsample
     
     def fit_model(self):
-        model= rf(n_estimators=self.ntrees,
-                  max_depth=self.max_depth)
-        
+
+        model = BaggingClassifier(base_estimator=DecisionTreeClassifier(), max_samples=self.subsample, n_estimators=self.ntrees)
         fitted_model = model.fit(self.X,self.y)
         
         return fitted_model
@@ -89,9 +94,18 @@ class binomialRF:
         main_effects_counts = df.value_counts().rename_axis('feature').reset_index(name='TestStatistic')
         return(main_effects_counts)
     
-    def calculate_pvalue(self, main_effects_counts): 
+    def calculate_naive_pvalue(self, main_effects_counts): 
         main_effects_counts['pvalues'] = [st.binom_test(x, 20, 1/20, alternative='greater') for x in main_effects_counts.TestStatistic]
         fdrs = correct.fdrcorrection(main_effects_counts.pvalues,  method='negcorr' )[1]
         main_effects_counts['FDR']= fdrs
         return(main_effects_counts)
+
+    def calculate_cbinom(self):
+        correlbinom = importr('correlbinom')
+
+        ncols= len(self.X.columns)
+        success_prob = 1 / ncols
+        correlbinom.correlbinom(self.subsample_percentage, success_prob, self.ntrees)
+
+    #def calculate_correlated_pvalues(self, main_effects_counts):
 
