@@ -46,19 +46,25 @@ class binomialRF:
     
     Parameters:
     -----------
-    num_trees : integer, greater than zero
+    
+    X : data.frame or array
+        The predictor matrix for which one wants to learn the features' 
+        significance. 
+
+    y : the label/outcome vector
+        The y vector used to label the instances/observations in the
+        design/predictor matrix, X. 
+    
+    
+    ntrees : integer, greater than zero
         The (maximum) number of trees to build in fitting the model.  We
         highly recommend using early stopping rather than guesswork or
         grid search to set this parameter.
     
-    subsample : int, default is 3
-        The maximum depth to use when building trees. This is an important
-        parameter.  Smaller values are more likely to underfit and 
-        larger values more likely to overfit.
+    subsample : float, default is .3
+        The percentage of cases sampled by each decision tree to train each
+        weak learner in the random forest classifier. 
     
-    feat_sample_by_tree : float, default is 1
-        The percentage of features to consider for each tree.
-        Works multiplicatively with feat_ample_by_node.
     
     References:
     -----------
