@@ -3,7 +3,6 @@
 """binomialRF: feature selection in random forests using random forests"""
 
 import warnings
-import numpy as np
 import pandas as pd
 import structure_dt as stdt
 import graphs
@@ -14,12 +13,7 @@ import random
 #cimport cython
 
 # evaluate random forest ensemble for regression
-from numpy import mean
-from numpy import std
-from sklearn.datasets import make_regression
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedKFold
-#from sklearn.ensemble import RandomForestRegressor as rf2
+
 import sklearn.tree
 import pandas as pd
 import scipy.stats as st
@@ -32,6 +26,10 @@ from sklearn.ensemble import RandomForestClassifier as rf
 from sklearn.datasets import make_classification
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
+
+import scipy.stats as st
+import statsmodels.stats.multitest as correct
+
 
 
 class binomialRF:
@@ -68,7 +66,7 @@ class binomialRF:
     Zaim, Samir Rachid, Colleen Kenost, ..., Hao Helen Zhang, and Yves A. 
     Lussier. "binomialRF: Interpretable combinatoric efficiency of random 
     forests to identify biomarker interactions." bioRxiv (2020): 681973.
-    
+    s
     """
     
     def __init__(self, X, y, ntrees, subsample):
@@ -105,7 +103,8 @@ class binomialRF:
 
         ncols= len(self.X.columns)
         success_prob = 1 / ncols
-        correlbinom.correlbinom(self.subsample_percentage, success_prob, self.ntrees)
+        cbinom= correlbinom.correlbinom(self.subsample_percentage, success_prob, self.ntrees)
+        return cbinom
 
-    #def calculate_correlated_pvalues(self, main_effects_counts):
+    def calculate_correlated_pvalues(self, main_effects_counts, cbinom):
 
