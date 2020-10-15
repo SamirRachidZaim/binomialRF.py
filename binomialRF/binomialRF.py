@@ -68,11 +68,13 @@ class binomialRF:
     
     References:
     -----------
-    
-    Zaim, Samir Rachid, Colleen Kenost, ..., Hao Helen Zhang, and Yves A. 
-    Lussier. "binomialRF: Interpretable combinatoric efficiency of random 
-    forests to identify biomarker interactions." bioRxiv (2020): 681973.
-    s
+    Rachid Zaim, S., Kenost, C., Berghout, J. et al. binomialRF: 
+    interpretable combinatoric efficiency of random forests to 
+    identify biomarker interactions. BMC Bioinformatics 21, 374 
+    (2020). https://doi.org/10.1186/s12859-020-03718-9
+
+
+
     """
     
     def __init__(self, X, y, ntrees, subsample):
@@ -109,7 +111,7 @@ class binomialRF:
 
         ncols= len(self.X.columns)
         success_prob = 1 / ncols
-        cbinom= correlbinom.correlbinom(self.subsample_percentage, success_prob, self.ntrees)
+        cbinom= correlbinom.correlbinom(self.subsample, success_prob, self.ntrees)
         return cbinom
 
     def calculate_correlated_pvalues(self, main_effects_counts, cbinom):
