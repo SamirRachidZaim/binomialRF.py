@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'binomialRF',         # How you named your package folder (MyLib)
   packages = ['binomialRF'],   # Chose the same as "name"
-  version = '0.1.1',      # Start with a small number and increase it with every change you make
+  version = '0.1.2',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'The binomialRF package is a random forest-based feature selection package that provides a feature selection algorithm to be used in randomForest classifiers.',   # Give a short description about your library
   author = 'Samir Rachid Zaim',                   # Type in your name
