@@ -25,7 +25,7 @@ The k.binomialRF algorithm extends the main effects search to K-way (or multiway
 
 ## References
 
-- Zaim, Samir Rachid, Colleen Kenost, Joanne Berghout, Wesley Chiu, Liam Wilson, Hao Helen Zhang, and Yves A. Lussier. "binomialRF: Interpretable combinatoric efficiency of random forests to identify biomarker interactions." bioRxiv (2020): 681973.
+- Rachid Zaim, Samir, Colleen Kenost, Joanne Berghout, Wesley Chiu, Liam Wilson, Hao Helen Zhang, and Yves A. Lussier. "binomialRF: interpretable combinatoric efficiency of random forests to identify biomarker interactions." BMC bioinformatics 21, no. 1 (2020): 1-22.
 
 ## Manuscript
 
